@@ -28,13 +28,23 @@ if (!fs.existsSync(subdivisionsDir)) {
 
 // Process Countries
 const countriesMap = {};
-const parsedCountries = countries.map(country => {
-  countriesMap[country.objectId] = country;
-  return {
-    name: country.name,
-    code: country.code
-  };
-});
+const parsedCountries = [];
+countries
+  .sort((a, b) => a.name.localeCompare(b.name))
+  .forEach(rawCountry => {
+    const country = {
+      name: rawCountry.name,
+      code: rawCountry.code
+    };
+
+    countriesMap[rawCountry.objectId] = rawCountry;
+
+    if (rawCountry.code === 'US' || rawCountry.code === 'CA') {
+      parsedCountries.unshift(country);
+    } else {
+      parsedCountries.push(country);
+    }
+  });
 
 fs.writeFileSync(countriesDir + 'countries.json', JSON.stringify(parsedCountries, null, 4));
 
@@ -60,7 +70,8 @@ for (let city of cities) {
 }
 
 Object.entries(parsedCities).forEach(([code, { items }]) => {
-  let data = JSON.stringify(items, null, 4);
+  const cities = items.sort((a, b) => a.localeCompare(b));
+  let data = JSON.stringify(cities, null, 4);
   fs.writeFileSync(citiesDir + code + '.json', data);
 });
 
@@ -89,7 +100,8 @@ for (let state of states) {
 }
 
 Object.entries(parsedStates).forEach(([code, { items }]) => {
-  let data = JSON.stringify(items, null, 4);
+  const subdivisions = items.sort((a, b) => a.name.localeCompare(b.name));
+  let data = JSON.stringify(subdivisions, null, 4);
   fs.writeFileSync(subdivisionsDir + code + '.json', data);
 });
 
