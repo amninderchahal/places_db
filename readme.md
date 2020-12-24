@@ -3,5 +3,8 @@
 ## Run
 
 ```bash
-node parser.js
+$ yarn
+$ npm start
 ```
+
+Output files will be placed inside dist folder.
